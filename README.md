@@ -1,4 +1,4 @@
-# ArchAI Code Sight
+# Archai
 
 A powerful architecture analysis and visualization tool that helps developers understand and visualize codebase architecture through interactive graphs and insights.
 
