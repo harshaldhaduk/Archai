@@ -1,73 +1,113 @@
-# Welcome to your Lovable project
+# ArchAI Code Sight
 
-## Project info
+A powerful architecture analysis and visualization tool that helps developers understand and visualize codebase architecture through interactive graphs and insights.
 
-**URL**: https://lovable.dev/projects/500d065d-31c9-4581-8b15-a286c5c9892f
+## Features
 
-## How can I edit this code?
+- **Codebase Analysis**: Upload and analyze your codebase to understand its structure
+- **Architecture Visualization**: Interactive graphs showing service relationships and dependencies
+- **GitHub Integration**: Connect directly to GitHub repositories for seamless analysis
+- **Service Details**: Deep dive into individual services with detailed information
+- **Modern UI**: Clean, responsive interface built with React and Tailwind CSS
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18, TypeScript, Vite
+- **UI Components**: shadcn/ui, Tailwind CSS
+- **Backend**: Supabase (Database, Auth, Edge Functions)
+- **Visualization**: Custom React Flow implementation
+- **State Management**: React Context API
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/500d065d-31c9-4581-8b15-a286c5c9892f) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v18 or higher)
+- npm or yarn
+- Supabase account (for backend services)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository:
+```bash
+git clone https://github.com/harshaldhaduk/Archai.git
+cd Archai
+```
 
-Follow these steps:
+2. Install dependencies:
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4. Configure your Supabase credentials in `.env.local`:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+5. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+6. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Project Structure
 
-**Use GitHub Codespaces**
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── ArchitectureGraph.tsx
+│   ├── CustomNode.tsx
+│   └── ServiceDetails.tsx
+├── contexts/           # React contexts
+├── hooks/              # Custom React hooks
+├── integrations/       # External service integrations
+│   └── supabase/       # Supabase client and types
+├── lib/                # Utility functions
+├── pages/              # Application pages
+└── main.tsx           # Application entry point
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Usage
 
-## What technologies are used for this project?
+1. **Authentication**: Sign up or log in to access the application
+2. **Upload Codebase**: Upload your code files or connect to a GitHub repository
+3. **Analysis**: The system will analyze your codebase and generate architecture insights
+4. **Visualization**: Explore the interactive architecture graph
+5. **Details**: Click on services to view detailed information
 
-This project is built with:
+## Development
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Available Scripts
 
-## How can I deploy this project?
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-Simply open [Lovable](https://lovable.dev/projects/500d065d-31c9-4581-8b15-a286c5c9892f) and click on Share -> Publish.
+### Contributing
 
-## Can I connect a custom domain to my Lovable project?
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
-Yes, you can!
+## License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Support
+
+If you have any questions or need help, please open an issue on GitHub or contact the maintainers.
+
+---
+
+Built with ❤️ for developers who want to understand their codebase architecture.
