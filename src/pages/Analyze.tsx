@@ -43,8 +43,42 @@ const Analyze = () => {
         description: "Analyzing architecture patterns and best practices",
       });
 
-      const result = await generateInsights(analysisId, graphData);
-      setInsights(result.insights);
+      // For demo mode, use mock insights instead of calling Supabase
+      if (type === 'demo') {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const mockInsights = `## Architecture Analysis
+
+**Overall Pattern**: Microservices Architecture
+
+**Key Strengths**:
+- Clear separation of concerns with dedicated services
+- API Gateway provides centralized routing and authentication
+- Database isolation ensures data consistency
+- AI service enables intelligent processing
+
+**Scalability Considerations**:
+- API Gateway may become a bottleneck under high load
+- Consider implementing caching layers
+- Database should be optimized for read-heavy workloads
+
+**Security Recommendations**:
+- Implement proper authentication at the API Gateway
+- Use HTTPS for all service communications
+- Add rate limiting to prevent abuse
+
+**Improvements**:
+- Consider adding a message queue for async processing
+- Implement health checks for all services
+- Add monitoring and logging infrastructure`;
+
+        setInsights(mockInsights);
+      } else {
+        // For real uploads, call the actual Supabase function
+        const result = await generateInsights(analysisId, graphData);
+        setInsights(result.insights);
+      }
 
       toast({
         title: "Insights generated!",
@@ -122,13 +156,15 @@ const Analyze = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <Card className="glass-panel p-6 h-[calc(100vh-20rem)]">
+              <Card className="glass-panel p-6">
                 <h2 className="text-xl font-semibold mb-4">Architecture Graph</h2>
-                <ArchitectureGraph
-                  nodes={graphData.nodes}
-                  edges={graphData.edges}
-                  onNodeClick={setSelectedNode}
-                />
+                <div className="h-[600px]">
+                  <ArchitectureGraph
+                    nodes={graphData.nodes}
+                    edges={graphData.edges}
+                    onNodeClick={setSelectedNode}
+                  />
+                </div>
               </Card>
 
               {insights && (
@@ -137,8 +173,19 @@ const Analyze = () => {
                     <Sparkles className="w-5 h-5 text-primary" />
                     <h2 className="text-xl font-semibold">AI Insights</h2>
                   </div>
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <ReactMarkdown>{insights}</ReactMarkdown>
+                  <div className="prose prose-slate dark:prose-invert max-w-none">
+                    <ReactMarkdown 
+                      className="
+                        prose-headings:font-bold prose-headings:text-foreground
+                        prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
+                        prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
+                        prose-p:text-base prose-p:leading-7 prose-p:mb-4
+                        prose-strong:text-primary prose-strong:font-semibold
+                        prose-ul:my-4 prose-ul:space-y-2
+                        prose-li:text-muted-foreground prose-li:leading-relaxed"
+                    >
+                      {insights}
+                    </ReactMarkdown>
                   </div>
                 </Card>
               )}

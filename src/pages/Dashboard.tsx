@@ -108,12 +108,69 @@ const Dashboard = () => {
     setIsLoading(true);
     
     try {
-      const parseResult = await parseArchitecture('', 'Demo Architecture', 'demo');
+      // Demo data that works without Supabase functions
+      const demoGraphData = {
+        nodes: [
+          {
+            id: '1',
+            type: 'custom',
+            position: { x: 100, y: 100 },
+            data: {
+              label: 'Frontend Service',
+              type: 'service',
+              description: 'Main user interface built with React and TypeScript',
+              connections: 1,
+              dependencies: ['API Gateway']
+            }
+          },
+          {
+            id: '2',
+            type: 'custom',
+            position: { x: 400, y: 100 },
+            data: {
+              label: 'API Gateway',
+              type: 'api',
+              description: 'RESTful API gateway handling authentication and routing',
+              connections: 2,
+              dependencies: ['Database', 'AI Service']
+            }
+          },
+          {
+            id: '3',
+            type: 'custom',
+            position: { x: 100, y: 300 },
+            data: {
+              label: 'Database',
+              type: 'database',
+              description: 'Primary data storage with user and application data',
+              connections: 1,
+              dependencies: []
+            }
+          },
+          {
+            id: '4',
+            type: 'custom',
+            position: { x: 400, y: 300 },
+            data: {
+              label: 'AI Service',
+              type: 'llm',
+              description: 'Machine learning service for code analysis and insights',
+              connections: 1,
+              dependencies: []
+            }
+          }
+        ],
+        edges: [
+          { id: 'e1-2', source: '1', target: '2', type: 'http' },
+          { id: 'e2-3', source: '2', target: '3', type: 'database' },
+          { id: 'e2-4', source: '2', target: '4', type: 'http' }
+        ]
+      };
       
       navigate("/analyze", { 
         state: { 
-          analysisId: parseResult.analysisId,
-          graphData: parseResult.graphData,
+          analysisId: 'demo-analysis-123',
+          graphData: demoGraphData,
           type: "demo" 
         } 
       });

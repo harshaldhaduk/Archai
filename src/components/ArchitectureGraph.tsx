@@ -35,7 +35,7 @@ export const ArchitectureGraph = ({ nodes, edges, onNodeClick }: ArchitectureGra
   );
 
   return (
-    <div className="w-full h-full max-h-[80vh] rounded-lg overflow-hidden border border-border bg-card">
+    <div className="w-full h-full rounded-lg overflow-hidden border border-border bg-card">
       <ReactFlow
         nodes={nodesState}
         edges={edgesState}
@@ -49,6 +49,7 @@ export const ArchitectureGraph = ({ nodes, edges, onNodeClick }: ArchitectureGra
         minZoom={0.1}
         maxZoom={1.5}
         className="bg-card"
+        proOptions={{ hideAttribution: true }}
       >
         <Background className="bg-background" />
         <Controls className="bg-card border-border" />
