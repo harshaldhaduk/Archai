@@ -35,7 +35,7 @@ export const ArchitectureGraph = ({ nodes, edges, onNodeClick }: ArchitectureGra
   );
 
   return (
-    <div className="w-full h-full max-h-[80vh] rounded-lg overflow-hidden border border-border bg-card">
+    <div className="w-full h-full rounded-lg overflow-hidden border border-border bg-card">
       <ReactFlow
         nodes={nodesState}
         edges={edgesState}
@@ -45,15 +45,14 @@ export const ArchitectureGraph = ({ nodes, edges, onNodeClick }: ArchitectureGra
         nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
         fitView
-        fitViewOptions={{ padding: 0.2, duration: 400 }}
+        fitViewOptions={{ padding: 0.3, duration: 400 }}
         minZoom={0.1}
         maxZoom={1.5}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.6 }}
         className="bg-card"
       >
         <Background className="bg-background" />
-        <Controls className="bg-card border-border" />
         <MiniMap
-          className="bg-card border-border"
           nodeColor={(node) => {
             switch (node.data.type) {
               case "service": return "hsl(191 91% 55%)";
@@ -62,6 +61,13 @@ export const ArchitectureGraph = ({ nodes, edges, onNodeClick }: ArchitectureGra
               case "llm": return "hsl(24 95% 53%)";
               default: return "hsl(215 20% 65%)";
             }
+          }}
+          maskColor="hsl(222 47% 5% / 0.8)"
+          style={{
+            backgroundColor: 'hsl(222 47% 8%)',
+            border: '0.5px solid hsl(191 91% 55%)',
+            borderRadius: '0.75rem',
+            overflow: 'hidden',
           }}
         />
       </ReactFlow>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Github, Sparkles, ArrowRight, LogOut } from "lucide-react";
+import { Upload, Github, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,19 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { UploadZone } from "@/components/UploadZone";
 import { uploadCodebase, parseArchitecture, fetchGithubRepo } from "@/lib/api";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
   const [githubUrl, setGithubUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signOut, user } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
-  };
 
   const handleFileUpload = async (file: File) => {
     setIsLoading(true);
@@ -115,12 +108,100 @@ const Dashboard = () => {
     setIsLoading(true);
     
     try {
-      const parseResult = await parseArchitecture('', 'Demo Architecture', 'demo');
+      // Original Lovable demo data
+      const demoGraphData = {
+        nodes: [
+          {
+            id: '1',
+            type: 'custom',
+            position: { x: 250, y: 0 },
+            data: {
+              label: 'API Gateway',
+              description: 'Main entry point handling authentication, rate limiting, and routing requests to microservices.',
+              type: 'service',
+              connections: 4,
+              dependencies: ['Auth Service', 'User Service'],
+              codePath: './services/api-gateway',
+            },
+          },
+          {
+            id: '2',
+            type: 'custom',
+            position: { x: 100, y: 150 },
+            data: {
+              label: 'Auth Service',
+              description: 'Manages user authentication and authorization using OAuth2 and JWT tokens.',
+              type: 'service',
+              connections: 2,
+              dependencies: ['PostgreSQL'],
+              codePath: './services/auth',
+            },
+          },
+          {
+            id: '3',
+            type: 'custom',
+            position: { x: 400, y: 150 },
+            data: {
+              label: 'User Service',
+              description: 'CRUD operations for user profiles, preferences, and account settings.',
+              type: 'service',
+              connections: 3,
+              dependencies: ['PostgreSQL', 'Redis Cache'],
+              codePath: './services/users',
+            },
+          },
+          {
+            id: '4',
+            type: 'custom',
+            position: { x: 250, y: 300 },
+            data: {
+              label: 'AI Processor',
+              description: 'LLM-powered service for natural language understanding and content generation.',
+              type: 'llm',
+              connections: 2,
+              dependencies: ['OpenAI API', 'Vector DB'],
+              codePath: './services/ai-processor',
+            },
+          },
+          {
+            id: '5',
+            type: 'custom',
+            position: { x: 100, y: 450 },
+            data: {
+              label: 'PostgreSQL',
+              description: 'Primary relational database storing user data and application state.',
+              type: 'database',
+              connections: 3,
+              codePath: './infrastructure/postgres',
+            },
+          },
+          {
+            id: '6',
+            type: 'custom',
+            position: { x: 400, y: 450 },
+            data: {
+              label: 'Redis Cache',
+              description: 'In-memory data store for caching and session management.',
+              type: 'database',
+              connections: 2,
+              codePath: './infrastructure/redis',
+            },
+          },
+        ],
+        edges: [
+          { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: 'hsl(191 91% 55%)' } },
+          { id: 'e1-3', source: '1', target: '3', animated: true, style: { stroke: 'hsl(191 91% 55%)' } },
+          { id: 'e2-5', source: '2', target: '5', style: { stroke: 'hsl(267 84% 65%)' } },
+          { id: 'e3-5', source: '3', target: '5', style: { stroke: 'hsl(267 84% 65%)' } },
+          { id: 'e3-6', source: '3', target: '6', style: { stroke: 'hsl(267 84% 65%)' } },
+          { id: 'e3-4', source: '3', target: '4', animated: true, style: { stroke: 'hsl(24 95% 53%)' } },
+        ],
+      };
       
       navigate("/analyze", { 
         state: { 
-          analysisId: parseResult.analysisId,
-          graphData: parseResult.graphData,
+          analysisId: 'demo-analysis-123',
+          graphData: demoGraphData,
           type: "demo" 
         } 
       });
@@ -149,11 +230,7 @@ const Dashboard = () => {
               <span className="text-xl font-bold gradient-text">Archai</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{user?.email}</span>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </Button>
+              <span className="text-sm text-muted-foreground">Welcome</span>
             </div>
           </div>
         </div>
