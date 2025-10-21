@@ -68,13 +68,24 @@ serve(async (req) => {
 
     // Fetch repository zipball from GitHub API
     const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/zipball`;
-    const githubResponse = await fetch(githubApiUrl, {
-      headers: {
-        'User-Agent': 'Archai-CodeSight',
-        'Accept': 'application/vnd.github+json',
-      },
-      redirect: 'follow',
-    });
+    console.log(`[fetch-github-repo] Requesting: ${githubApiUrl}`);
+    
+    let githubResponse;
+    try {
+      githubResponse = await fetch(githubApiUrl, {
+        headers: {
+          'User-Agent': 'Archai-CodeSight',
+          'Accept': 'application/vnd.github+json',
+        },
+        redirect: 'follow',
+      });
+    } catch (fetchError) {
+      console.error('[fetch-github-repo] Network error:', fetchError);
+      return new Response(
+        JSON.stringify({ error: 'Unable to connect to GitHub. Please check your internet connection and try again.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 503 }
+      );
+    }
 
     if (!githubResponse.ok) {
       console.error(`[fetch-github-repo] GitHub API error: ${githubResponse.status}`);

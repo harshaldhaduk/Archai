@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Sparkles, Loader2, Wand2 } from "lucide-react";
 import { ArchitectureGraph } from "@/components/ArchitectureGraph";
 import { ServiceDetails } from "@/components/ServiceDetails";
-import { Node } from "@xyflow/react";
+import { Node, ReactFlowProvider } from "@xyflow/react";
 import { generateInsights } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from 'react-markdown';
@@ -121,6 +121,7 @@ const Analyze = () => {
               </div>
             </div>
             <Button
+              type="button"
               onClick={handleGenerateInsights}
               disabled={isGeneratingInsights || !graphData}
               className="gap-2"
@@ -158,31 +159,33 @@ const Analyze = () => {
             <div className="lg:col-span-2 space-y-6">
               <Card className="glass-panel p-6">
                 <h2 className="text-xl font-semibold mb-4">Architecture Graph</h2>
-                <div className="h-[600px]">
-                  <ArchitectureGraph
-                    nodes={graphData.nodes}
-                    edges={graphData.edges}
-                    onNodeClick={setSelectedNode}
-                  />
+                <div className="h-[450px] overflow-hidden rounded-md">
+                  <ReactFlowProvider>
+                    <ArchitectureGraph
+                      nodes={graphData.nodes}
+                      edges={graphData.edges}
+                      onNodeClick={setSelectedNode}
+                    />
+                  </ReactFlowProvider>
                 </div>
               </Card>
 
               {insights && (
                 <Card className="glass-panel p-6 animate-fade-in">
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
                     <Sparkles className="w-5 h-5 text-primary" />
                     <h2 className="text-xl font-semibold">AI Insights</h2>
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
+                  <div className="prose prose-slate dark:prose-invert max-w-none space-y-4">
                     <ReactMarkdown 
-                      className="
-                        prose-headings:font-bold prose-headings:text-foreground
-                        prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
-                        prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
-                        prose-p:text-base prose-p:leading-7 prose-p:mb-4
-                        prose-strong:text-primary prose-strong:font-semibold
-                        prose-ul:my-4 prose-ul:space-y-2
-                        prose-li:text-muted-foreground prose-li:leading-relaxed"
+                      components={{
+                        h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3 text-foreground" {...props} />,
+                        h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-4 mb-2 text-foreground" {...props} />,
+                        p: ({node, ...props}) => <p className="text-base leading-relaxed mb-3 text-foreground/90" {...props} />,
+                        strong: ({node, ...props}) => <strong className="font-bold text-primary text-base" {...props} />,
+                        ul: ({node, ...props}) => <ul className="space-y-2 my-3 pl-5" {...props} />,
+                        li: ({node, ...props}) => <li className="text-sm leading-relaxed text-muted-foreground" {...props} />,
+                      }}
                     >
                       {insights}
                     </ReactMarkdown>

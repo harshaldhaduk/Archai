@@ -72,6 +72,10 @@ const Dashboard = () => {
       // Fetch GitHub repository
       const fetchResult = await fetchGithubRepo(githubUrl);
       
+      if (!fetchResult || !fetchResult.filePath) {
+        throw new Error("Unable to fetch repository. Please check the URL and try again.");
+      }
+      
       toast({
         title: "Parsing repository...",
         description: "Analyzing repository structure",
@@ -84,6 +88,10 @@ const Dashboard = () => {
         'github'
       );
       
+      if (!parseResult || !parseResult.graphData) {
+        throw new Error("Failed to analyze repository structure.");
+      }
+      
       navigate("/analyze", { 
         state: { 
           analysisId: parseResult.analysisId,
@@ -94,9 +102,26 @@ const Dashboard = () => {
       });
     } catch (error) {
       console.error('GitHub fetch error:', error);
+      
+      // Provide user-friendly error messages
+      let errorMessage = "Failed to fetch repository";
+      if (error instanceof Error) {
+        if (error.message.includes("not found") || error.message.includes("404")) {
+          errorMessage = "Repository not found. Please check the URL and ensure it's public.";
+        } else if (error.message.includes("rate limit") || error.message.includes("429")) {
+          errorMessage = "GitHub rate limit reached. Please try again in a few minutes.";
+        } else if (error.message.includes("network") || error.message.includes("connect")) {
+          errorMessage = "Unable to connect to GitHub. Please check your connection.";
+        } else if (error.message.includes("Unauthorized") || error.message.includes("401")) {
+          errorMessage = "Authentication failed. Please refresh and try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
-        title: "Fetch failed",
-        description: error instanceof Error ? error.message : "Failed to fetch repository",
+        title: "Unable to fetch repository",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -108,62 +133,90 @@ const Dashboard = () => {
     setIsLoading(true);
     
     try {
-      // Demo data that works without Supabase functions
+      // Demo data matching the architecture diagram
       const demoGraphData = {
         nodes: [
           {
             id: '1',
             type: 'custom',
-            position: { x: 100, y: 100 },
+            position: { x: 250, y: 50 },
             data: {
-              label: 'Frontend Service',
+              label: 'API Gateway',
               type: 'service',
-              description: 'Main user interface built with React and TypeScript',
-              connections: 1,
-              dependencies: ['API Gateway']
+              description: 'Central API gateway routing all service requests',
+              connections: 4,
+              dependencies: ['Auth Service', 'User Service', 'AI Processor']
             }
           },
           {
             id: '2',
             type: 'custom',
-            position: { x: 400, y: 100 },
+            position: { x: 50, y: 200 },
             data: {
-              label: 'API Gateway',
-              type: 'api',
-              description: 'RESTful API gateway handling authentication and routing',
+              label: 'Auth Service',
+              type: 'service',
+              description: 'Authentication and authorization service',
               connections: 2,
-              dependencies: ['Database', 'AI Service']
+              dependencies: ['PostgreSQL', 'API Gateway']
             }
           },
           {
             id: '3',
             type: 'custom',
-            position: { x: 100, y: 300 },
+            position: { x: 400, y: 200 },
             data: {
-              label: 'Database',
-              type: 'database',
-              description: 'Primary data storage with user and application data',
-              connections: 1,
-              dependencies: []
+              label: 'User Service',
+              type: 'service',
+              description: 'User management and profile service',
+              connections: 2,
+              dependencies: ['Redis Cache', 'AI Processor']
             }
           },
           {
             id: '4',
             type: 'custom',
-            position: { x: 400, y: 300 },
+            position: { x: 220, y: 300 },
             data: {
-              label: 'AI Service',
+              label: 'AI Processor',
               type: 'llm',
-              description: 'Machine learning service for code analysis and insights',
+              description: 'AI-powered code analysis and insights generation',
+              connections: 3,
+              dependencies: ['User Service', 'Auth Service', 'Redis Cache']
+            }
+          },
+          {
+            id: '5',
+            type: 'custom',
+            position: { x: 50, y: 450 },
+            data: {
+              label: 'PostgreSQL',
+              type: 'database',
+              description: 'Primary relational database for persistent storage',
               connections: 1,
+              dependencies: []
+            }
+          },
+          {
+            id: '6',
+            type: 'custom',
+            position: { x: 400, y: 450 },
+            data: {
+              label: 'Redis Cache',
+              type: 'database',
+              description: 'In-memory cache for high-performance data access',
+              connections: 2,
               dependencies: []
             }
           }
         ],
         edges: [
-          { id: 'e1-2', source: '1', target: '2', type: 'http' },
-          { id: 'e2-3', source: '2', target: '3', type: 'database' },
-          { id: 'e2-4', source: '2', target: '4', type: 'http' }
+          { id: 'e1-2', source: '1', target: '2', type: 'smoothstep', animated: true },
+          { id: 'e1-3', source: '1', target: '3', type: 'smoothstep', animated: true },
+          { id: 'e2-5', source: '2', target: '5', type: 'smoothstep' },
+          { id: 'e3-4', source: '3', target: '4', type: 'smoothstep' },
+          { id: 'e3-6', source: '3', target: '6', type: 'smoothstep' },
+          { id: 'e4-2', source: '4', target: '2', type: 'smoothstep' },
+          { id: 'e4-6', source: '4', target: '6', type: 'smoothstep' }
         ]
       };
       

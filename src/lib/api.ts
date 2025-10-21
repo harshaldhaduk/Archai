@@ -63,6 +63,13 @@ export async function fetchGithubRepo(githubUrl: string): Promise<UploadResponse
     body: { githubUrl },
   });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    // Provide helpful error message if functions aren't deployed
+    if (error.message.includes('Failed to send a request to the Edge Function') || 
+        error.message.includes('FunctionsHttpError')) {
+      throw new Error('GitHub ingestion requires Supabase Edge Functions to be deployed. Please deploy functions or use Demo Mode.');
+    }
+    throw new Error(error.message);
+  }
   return data;
 }

@@ -19,10 +19,10 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 const colorMap: Record<string, string> = {
-  service: "from-primary/20 to-primary/10 border-primary/50",
-  database: "from-secondary/20 to-secondary/10 border-secondary/50",
-  api: "from-green-500/20 to-green-500/10 border-green-500/50",
-  llm: "from-orange-500/20 to-orange-500/10 border-orange-500/50",
+  service: "from-primary/40 to-primary/20 border-primary/70",
+  database: "from-secondary/40 to-secondary/20 border-secondary/70",
+  api: "from-green-500/40 to-green-500/20 border-green-500/70",
+  llm: "from-orange-500/40 to-orange-500/20 border-orange-500/70",
 };
 
 export const CustomNode = memo((props: NodeProps) => {
