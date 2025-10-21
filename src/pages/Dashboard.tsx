@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Github, Sparkles, ArrowRight, LogOut } from "lucide-react";
+import { Upload, Github, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,19 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { UploadZone } from "@/components/UploadZone";
 import { uploadCodebase, parseArchitecture, fetchGithubRepo } from "@/lib/api";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
   const [githubUrl, setGithubUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signOut, user } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
-  };
 
   const handleFileUpload = async (file: File) => {
     setIsLoading(true);
@@ -149,11 +142,7 @@ const Dashboard = () => {
               <span className="text-xl font-bold gradient-text">Archai</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{user?.email}</span>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </Button>
+              <span className="text-sm text-muted-foreground">Demo Mode</span>
             </div>
           </div>
         </div>
