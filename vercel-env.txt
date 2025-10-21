@@ -1,0 +1,6 @@
+# Vercel Environment Variables
+# Copy these to your Vercel project settings (Settings → Environment Variables)
+
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+OPENAI_API_KEY=your-openai-api-key-here
