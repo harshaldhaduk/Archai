@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Github, Sparkles, ArrowRight } from "lucide-react";
+import { Upload, Github, Sparkles, ArrowRight, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,19 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { UploadZone } from "@/components/UploadZone";
 import { uploadCodebase, parseArchitecture, fetchGithubRepo } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
   const [githubUrl, setGithubUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   const handleFileUpload = async (file: File) => {
     setIsLoading(true);
@@ -108,69 +115,12 @@ const Dashboard = () => {
     setIsLoading(true);
     
     try {
-      // Demo data that works without Supabase functions
-      const demoGraphData = {
-        nodes: [
-          {
-            id: '1',
-            type: 'service',
-            position: { x: 100, y: 100 },
-            data: {
-              label: 'Frontend Service',
-              type: 'service',
-              description: 'Main user interface built with React and TypeScript',
-              connections: 1,
-              dependencies: ['API Gateway']
-            }
-          },
-          {
-            id: '2',
-            type: 'service',
-            position: { x: 400, y: 100 },
-            data: {
-              label: 'API Gateway',
-              type: 'api',
-              description: 'RESTful API gateway handling authentication and routing',
-              connections: 2,
-              dependencies: ['Database', 'AI Service']
-            }
-          },
-          {
-            id: '3',
-            type: 'service',
-            position: { x: 100, y: 300 },
-            data: {
-              label: 'Database',
-              type: 'database',
-              description: 'Primary data storage with user and application data',
-              connections: 1,
-              dependencies: []
-            }
-          },
-          {
-            id: '4',
-            type: 'service',
-            position: { x: 400, y: 300 },
-            data: {
-              label: 'AI Service',
-              type: 'llm',
-              description: 'Machine learning service for code analysis and insights',
-              connections: 1,
-              dependencies: []
-            }
-          }
-        ],
-        edges: [
-          { id: 'e1-2', source: '1', target: '2', type: 'http' },
-          { id: 'e2-3', source: '2', target: '3', type: 'database' },
-          { id: 'e2-4', source: '2', target: '4', type: 'http' }
-        ]
-      };
+      const parseResult = await parseArchitecture('', 'Demo Architecture', 'demo');
       
       navigate("/analyze", { 
         state: { 
-          analysisId: 'demo-analysis-123',
-          graphData: demoGraphData,
+          analysisId: parseResult.analysisId,
+          graphData: parseResult.graphData,
           type: "demo" 
         } 
       });
@@ -199,7 +149,11 @@ const Dashboard = () => {
               <span className="text-xl font-bold gradient-text">Archai</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Demo Mode</span>
+              <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>

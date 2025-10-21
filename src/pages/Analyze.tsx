@@ -43,42 +43,8 @@ const Analyze = () => {
         description: "Analyzing architecture patterns and best practices",
       });
 
-      // For demo mode, use mock insights instead of calling Supabase
-      if (type === 'demo') {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const mockInsights = `## Architecture Analysis
-
-**Overall Pattern**: Microservices Architecture
-
-**Key Strengths**:
-- Clear separation of concerns with dedicated services
-- API Gateway provides centralized routing and authentication
-- Database isolation ensures data consistency
-- AI service enables intelligent processing
-
-**Scalability Considerations**:
-- API Gateway may become a bottleneck under high load
-- Consider implementing caching layers
-- Database should be optimized for read-heavy workloads
-
-**Security Recommendations**:
-- Implement proper authentication at the API Gateway
-- Use HTTPS for all service communications
-- Add rate limiting to prevent abuse
-
-**Improvements**:
-- Consider adding a message queue for async processing
-- Implement health checks for all services
-- Add monitoring and logging infrastructure`;
-
-        setInsights(mockInsights);
-      } else {
-        // For real uploads, call the actual Supabase function
-        const result = await generateInsights(analysisId, graphData);
-        setInsights(result.insights);
-      }
+      const result = await generateInsights(analysisId, graphData);
+      setInsights(result.insights);
 
       toast({
         title: "Insights generated!",
