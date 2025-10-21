@@ -108,12 +108,61 @@ const Dashboard = () => {
     setIsLoading(true);
     
     try {
-      const parseResult = await parseArchitecture('', 'Demo Architecture', 'demo');
+      // Demo data that works without Supabase functions
+      const demoGraphData = {
+        nodes: [
+          {
+            id: '1',
+            type: 'service',
+            position: { x: 100, y: 100 },
+            data: {
+              label: 'Frontend Service',
+              type: 'React App',
+              description: 'Main user interface built with React and TypeScript'
+            }
+          },
+          {
+            id: '2',
+            type: 'service',
+            position: { x: 400, y: 100 },
+            data: {
+              label: 'API Gateway',
+              type: 'Express Server',
+              description: 'RESTful API gateway handling authentication and routing'
+            }
+          },
+          {
+            id: '3',
+            type: 'service',
+            position: { x: 100, y: 300 },
+            data: {
+              label: 'Database',
+              type: 'PostgreSQL',
+              description: 'Primary data storage with user and application data'
+            }
+          },
+          {
+            id: '4',
+            type: 'service',
+            position: { x: 400, y: 300 },
+            data: {
+              label: 'AI Service',
+              type: 'Python Service',
+              description: 'Machine learning service for code analysis and insights'
+            }
+          }
+        ],
+        edges: [
+          { id: 'e1-2', source: '1', target: '2', type: 'http' },
+          { id: 'e2-3', source: '2', target: '3', type: 'database' },
+          { id: 'e2-4', source: '2', target: '4', type: 'http' }
+        ]
+      };
       
       navigate("/analyze", { 
         state: { 
-          analysisId: parseResult.analysisId,
-          graphData: parseResult.graphData,
+          analysisId: 'demo-analysis-123',
+          graphData: demoGraphData,
           type: "demo" 
         } 
       });
