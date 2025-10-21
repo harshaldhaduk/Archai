@@ -48,10 +48,10 @@ serve(async (req) => {
 
     console.log(`[generate-insights] Authenticated user: ${user.id}`);
 
-    // Get LOVABLE_API_KEY from environment
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    // Get OPENAI_API_KEY from environment
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured');
     }
 
     // Prepare context for AI
@@ -78,17 +78,17 @@ Provide a concise analysis covering:
 
 Keep the analysis under 200 words and focus on actionable insights.`;
 
-    console.log('[generate-insights] Calling Lovable AI...');
+    console.log('[generate-insights] Calling OpenAI API...');
 
-    // Call Lovable AI
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Call OpenAI API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',

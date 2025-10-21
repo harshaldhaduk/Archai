@@ -70,7 +70,7 @@ serve(async (req) => {
     const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/zipball`;
     const githubResponse = await fetch(githubApiUrl, {
       headers: {
-        'User-Agent': 'Archai-Lovable',
+        'User-Agent': 'Archai-CodeSight',
         'Accept': 'application/vnd.github+json',
       },
       redirect: 'follow',
