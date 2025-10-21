@@ -117,8 +117,10 @@ const Dashboard = () => {
             position: { x: 100, y: 100 },
             data: {
               label: 'Frontend Service',
-              type: 'React App',
-              description: 'Main user interface built with React and TypeScript'
+              type: 'service',
+              description: 'Main user interface built with React and TypeScript',
+              connections: 1,
+              dependencies: ['API Gateway']
             }
           },
           {
@@ -127,8 +129,10 @@ const Dashboard = () => {
             position: { x: 400, y: 100 },
             data: {
               label: 'API Gateway',
-              type: 'Express Server',
-              description: 'RESTful API gateway handling authentication and routing'
+              type: 'api',
+              description: 'RESTful API gateway handling authentication and routing',
+              connections: 2,
+              dependencies: ['Database', 'AI Service']
             }
           },
           {
@@ -137,8 +141,10 @@ const Dashboard = () => {
             position: { x: 100, y: 300 },
             data: {
               label: 'Database',
-              type: 'PostgreSQL',
-              description: 'Primary data storage with user and application data'
+              type: 'database',
+              description: 'Primary data storage with user and application data',
+              connections: 1,
+              dependencies: []
             }
           },
           {
@@ -147,8 +153,10 @@ const Dashboard = () => {
             position: { x: 400, y: 300 },
             data: {
               label: 'AI Service',
-              type: 'Python Service',
-              description: 'Machine learning service for code analysis and insights'
+              type: 'llm',
+              description: 'Machine learning service for code analysis and insights',
+              connections: 1,
+              dependencies: []
             }
           }
         ],
