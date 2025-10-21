@@ -1,0 +1,13 @@
+project_id = "vfcrrxbbsiaorrlxybvz"
+
+[functions.upload-codebase]
+verify_jwt = true
+
+[functions.parse-architecture]
+verify_jwt = true
+
+[functions.generate-insights]
+verify_jwt = true
+
+[functions.fetch-github-repo]
+verify_jwt = true
