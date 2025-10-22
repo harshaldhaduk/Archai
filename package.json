@@ -1,5 +1,6 @@
 {
   "name": "archai-code-sight",
+  "description": "AI-powered codebase architecture visualization and analysis platform",
   "private": true,
   "version": "0.0.0",
   "type": "module",

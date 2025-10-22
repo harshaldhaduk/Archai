@@ -1,3 +1,8 @@
+/**
+ * Generate AI Insights Edge Function
+ * Analyzes codebase architecture and generates intelligent insights using LLM
+ */
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
