@@ -259,6 +259,14 @@ const Dashboard = () => {
           contextDesc = `Layout components defining ${fileCount} page template${fileCount > 1 ? 's' : ''} used across the app. These provide consistent structure like headers, footers, navigation, and sidebars. Every page wraps itself in a layout to maintain uniform design.`;
         } else if (lowerName.match(/store|state/)) {
           contextDesc = `State management handling ${fileCount} global data store${fileCount > 1 ? 's' : ''}. This manages application-wide state that needs to be accessed from multiple components, like user info, theme settings, or shopping cart contents. Centralizing state prevents prop-drilling and keeps data synchronized.`;
+        } else if (lowerName.match(/fetch.*github|github.*fetch/)) {
+          contextDesc = `Serverless function that downloads and processes GitHub repositories. When a user enters a GitHub URL, this function fetches the repository files, analyzes the directory structure, and stores the codebase for analysis. Acts as the bridge between GitHub's API and the application's architecture parsing system.`;
+        } else if (lowerName.match(/generate.*insight|insight.*generat/)) {
+          contextDesc = `AI-powered serverless function that analyzes codebases using large language models. Takes the parsed architecture graph and generates intelligent insights about code quality, design patterns, potential improvements, and onboarding guidance. This is where the "smart" analysis happens - turning raw code structure into actionable recommendations for developers.`;
+        } else if (lowerName.match(/parse.*architect|architect.*pars/)) {
+          contextDesc = `Serverless function that analyzes uploaded codebases and builds a visual architecture graph. Reads through files, identifies services, APIs, databases, and dependencies, then creates the node-edge structure you see in the visualization. This is the core parsing engine that understands your codebase structure.`;
+        } else if (lowerName.match(/upload.*codebase|codebase.*upload/)) {
+          contextDesc = `Handles file uploads when users drag-and-drop their codebase ZIP files. Validates the upload, stores it securely in cloud storage, and triggers the architecture parsing process. This is the entry point for analyzing local codebases rather than GitHub repositories.`;
         } else {
           contextDesc = `Module organizing ${fileCount} ${dirName}-related file${fileCount > 1 ? 's' : ''}${hasSubdirs ? ` across ${subdirCount} subdirectories` : ''} for the project. ${hasFewFiles ? 'Small, focused module - good starting point for understanding this functionality.' : hasMultipleFiles ? 'Larger module with multiple files working together to provide comprehensive functionality.' : 'Contains core functionality that other parts of the app depend on.'}`;
         }
