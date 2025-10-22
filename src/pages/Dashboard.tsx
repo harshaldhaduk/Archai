@@ -194,13 +194,15 @@ const Dashboard = () => {
     const generateSmartDescription = (dirName: string, lowerName: string, fileCount: number, subdirCount: number, hasSubdirs: boolean, hasFewFiles: boolean, hasMultipleFiles: boolean): string => {
       // Extract verbs and nouns from the directory name
       const words = lowerName.split(/[-_\s]+/);
-      const verbs = ['fetch', 'get', 'retrieve', 'download', 'upload', 'send', 'post', 'create', 'generate', 'build', 'parse', 'analyze', 'process', 'handle', 'manage', 'validate', 'check', 'update', 'delete', 'remove', 'sync', 'transform', 'convert', 'render', 'display', 'show', 'calculate', 'compute', 'format', 'sanitize', 'clean'];
-      const dataSources = ['github', 'gitlab', 'bitbucket', 'api', 'database', 'db', 'storage', 'cache', 'file', 'json', 'xml', 'csv', 'excel'];
-      const purposes = ['auth', 'user', 'admin', 'dashboard', 'report', 'analytics', 'notification', 'email', 'sms', 'payment', 'invoice', 'order', 'product', 'cart', 'checkout', 'search', 'filter', 'export', 'import'];
+      const verbs = ['fetch', 'get', 'retrieve', 'download', 'upload', 'send', 'post', 'create', 'generate', 'build', 'parse', 'analyze', 'process', 'handle', 'manage', 'validate', 'check', 'update', 'delete', 'remove', 'sync', 'transform', 'convert', 'render', 'display', 'show', 'calculate', 'compute', 'format', 'sanitize', 'clean', 'extract', 'compile', 'bundle', 'minify', 'optimize'];
+      const dataSources = ['github', 'gitlab', 'bitbucket', 'api', 'database', 'db', 'storage', 'cache', 'file', 'json', 'xml', 'csv', 'excel', 'redis', 'postgres', 'mongo', 'mysql', 's3', 'blob', 'cloud'];
+      const dataObjects = ['news', 'article', 'post', 'comment', 'message', 'notification', 'email', 'image', 'video', 'document', 'file', 'data', 'content', 'feed', 'event', 'log', 'metric', 'report', 'invoice', 'receipt', 'transaction', 'ticket', 'issue', 'task'];
+      const purposes = ['auth', 'user', 'admin', 'dashboard', 'report', 'analytics', 'notification', 'email', 'sms', 'payment', 'invoice', 'order', 'product', 'cart', 'checkout', 'search', 'filter', 'export', 'import', 'billing', 'subscription', 'webhook'];
       
       // Identify key components
       const mainVerb = words.find(w => verbs.includes(w));
       const dataSource = words.find(w => dataSources.includes(w));
+      const dataObject = words.find(w => dataObjects.includes(w));
       const purpose = words.find(w => purposes.includes(w));
       
       // Check for specific patterns
@@ -210,9 +212,15 @@ const Dashboard = () => {
         const source = getSourceDescription(dataSource);
         const object = words.filter(w => w !== mainVerb && w !== dataSource).join(' ') || 'data';
         
-        return `Serverless function that ${action} ${object} from ${source}. ${getContextualExplanation(mainVerb, dataSource, words)}`;
+        return `Serverless function that ${action} ${object} from ${source}. ${getContextualExplanation(mainVerb, dataSource, words, dataObject)}`;
+      } else if (mainVerb && dataObject) {
+        // Pattern: verb + data object (e.g., "fetch-news", "process-images")
+        const action = getActionDescription(mainVerb);
+        const objectDesc = getObjectDescription(dataObject);
+        
+        return `${mainVerb === 'fetch' || mainVerb === 'get' || mainVerb === 'retrieve' ? 'Retrieves' : mainVerb === 'process' ? 'Processes' : mainVerb === 'generate' ? 'Generates' : mainVerb === 'parse' ? 'Parses' : 'Handles'} ${objectDesc} from external sources. ${getObjectContextExplanation(mainVerb, dataObject, fileCount)} ${fileCount === 1 ? 'Focused module for this specific functionality.' : `Contains ${fileCount} files working together to handle ${dataObject} operations.`}`;
       } else if (mainVerb) {
-        // Pattern: verb + object (e.g., "generate-insights", "process-images")
+        // Pattern: verb only (e.g., "validator", "processor")
         const action = getActionDescription(mainVerb);
         const object = words.filter(w => w !== mainVerb).join(' ') || 'data';
         
@@ -274,7 +282,68 @@ const Dashboard = () => {
       return sourceMap[source] || source;
     };
     
-    const getContextualExplanation = (verb: string, source: string, words: string[]): string => {
+    const getObjectDescription = (dataObject: string): string => {
+      const objectDescriptions: Record<string, string> = {
+        'news': 'news articles and headlines',
+        'article': 'articles and blog posts',
+        'post': 'user posts and content',
+        'comment': 'user comments and discussions',
+        'message': 'messages and communications',
+        'notification': 'notifications and alerts',
+        'email': 'emails and correspondence',
+        'image': 'images and photos',
+        'video': 'videos and media files',
+        'document': 'documents and files',
+        'file': 'files and attachments',
+        'data': 'data and information',
+        'content': 'content and media',
+        'feed': 'feeds and streams',
+        'event': 'events and activities',
+        'log': 'logs and records',
+        'metric': 'metrics and measurements',
+        'report': 'reports and summaries',
+        'invoice': 'invoices and bills',
+        'receipt': 'receipts and transactions',
+        'transaction': 'transactions and payments',
+        'ticket': 'support tickets',
+        'issue': 'issues and bugs',
+        'task': 'tasks and assignments'
+      };
+      return objectDescriptions[dataObject] || dataObject;
+    };
+    
+    const getObjectContextExplanation = (verb: string, dataObject: string, fileCount: number): string => {
+      const contexts: Record<string, Record<string, string>> = {
+        'fetch': {
+          'news': 'Connects to news APIs or RSS feeds to download the latest headlines and article content. Used when users want to see current news or when the system needs to aggregate news from multiple sources.',
+          'article': 'Downloads article content from various sources. Handles API calls, content parsing, and data formatting.',
+          'image': 'Downloads images from URLs or cloud storage. Validates image formats and handles download errors.',
+          'data': 'Retrieves data from external APIs or databases. Acts as the data acquisition layer.',
+          'default': `Retrieves ${dataObject} from external sources and prepares it for use in the application.`
+        },
+        'process': {
+          'image': 'Transforms images through resizing, compression, format conversion, or applying filters. Optimizes images for web display.',
+          'data': 'Cleans, validates, and transforms raw data into a structured format the application can use.',
+          'news': 'Analyzes news content, extracts key information, categorizes articles, and prepares them for display.',
+          'default': `Transforms and validates ${dataObject} before storing or displaying it.`
+        },
+        'generate': {
+          'report': 'Creates formatted reports by aggregating data, applying calculations, and producing PDF/Excel outputs.',
+          'invoice': 'Generates invoices with line items, totals, taxes, and formatting for printing or email delivery.',
+          'notification': 'Creates notification messages based on events, formats them appropriately, and queues them for delivery.',
+          'default': `Creates ${dataObject} programmatically based on application data and business rules.`
+        },
+        'parse': {
+          'data': 'Reads and interprets data formats, converts them into structured objects the application can work with.',
+          'document': 'Extracts text and metadata from documents. Handles various file formats and encodings.',
+          'default': `Analyzes ${dataObject} structure and converts it into usable format.`
+        }
+      };
+      
+      return contexts[verb]?.[dataObject] || contexts[verb]?.['default'] || `Manages ${dataObject} through ${verb} operations.`;
+    };
+    
+    const getContextualExplanation = (verb: string, source: string, words: string[], dataObject?: string): string => {
       if (verb === 'fetch' && source === 'github') {
         return 'When a user enters a GitHub URL, this function downloads the repository files, analyzes the structure, and prepares it for architecture parsing. Acts as the bridge between GitHub\'s API and your application.';
       }
