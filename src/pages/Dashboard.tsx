@@ -190,215 +190,131 @@ const Dashboard = () => {
       }
     });
 
-    // Smart description generator that analyzes directory names contextually
+    // Truly intelligent description generator that understands ANY directory name
     const generateSmartDescription = (dirName: string, lowerName: string, fileCount: number, subdirCount: number, hasSubdirs: boolean, hasFewFiles: boolean, hasMultipleFiles: boolean): string => {
-      // Extract verbs and nouns from the directory name
-      const words = lowerName.split(/[-_\s]+/);
-      const verbs = ['fetch', 'get', 'retrieve', 'download', 'upload', 'send', 'post', 'create', 'generate', 'build', 'parse', 'analyze', 'process', 'handle', 'manage', 'validate', 'check', 'update', 'delete', 'remove', 'sync', 'transform', 'convert', 'render', 'display', 'show', 'calculate', 'compute', 'format', 'sanitize', 'clean', 'extract', 'compile', 'bundle', 'minify', 'optimize'];
-      const dataSources = ['github', 'gitlab', 'bitbucket', 'api', 'database', 'db', 'storage', 'cache', 'file', 'json', 'xml', 'csv', 'excel', 'redis', 'postgres', 'mongo', 'mysql', 's3', 'blob', 'cloud'];
-      const dataObjects = ['news', 'article', 'post', 'comment', 'message', 'notification', 'email', 'image', 'video', 'document', 'file', 'data', 'content', 'feed', 'event', 'log', 'metric', 'report', 'invoice', 'receipt', 'transaction', 'ticket', 'issue', 'task'];
-      const purposes = ['auth', 'user', 'admin', 'dashboard', 'report', 'analytics', 'notification', 'email', 'sms', 'payment', 'invoice', 'order', 'product', 'cart', 'checkout', 'search', 'filter', 'export', 'import', 'billing', 'subscription', 'webhook'];
+      // Parse directory name into meaningful components
+      const words = lowerName.split(/[-_\s]+/).filter(w => w.length > 0);
       
-      // Identify key components
-      const mainVerb = words.find(w => verbs.includes(w));
-      const dataSource = words.find(w => dataSources.includes(w));
-      const dataObject = words.find(w => dataObjects.includes(w));
-      const purpose = words.find(w => purposes.includes(w));
+      // Analyze word patterns to understand intent
+      const analysis = analyzeDirectoryIntent(words, dirName);
       
-      // Check for specific patterns
-      if (mainVerb && dataSource) {
-        // Pattern: verb + data source (e.g., "fetch-github-repo")
-        const action = getActionDescription(mainVerb);
-        const source = getSourceDescription(dataSource);
-        const object = words.filter(w => w !== mainVerb && w !== dataSource).join(' ') || 'data';
-        
-        return `Serverless function that ${action} ${object} from ${source}. ${getContextualExplanation(mainVerb, dataSource, words, dataObject)}`;
-      } else if (mainVerb && dataObject) {
-        // Pattern: verb + data object (e.g., "fetch-news", "process-images")
-        const action = getActionDescription(mainVerb);
-        const objectDesc = getObjectDescription(dataObject);
-        
-        return `${mainVerb === 'fetch' || mainVerb === 'get' || mainVerb === 'retrieve' ? 'Retrieves' : mainVerb === 'process' ? 'Processes' : mainVerb === 'generate' ? 'Generates' : mainVerb === 'parse' ? 'Parses' : 'Handles'} ${objectDesc} from external sources. ${getObjectContextExplanation(mainVerb, dataObject, fileCount)} ${fileCount === 1 ? 'Focused module for this specific functionality.' : `Contains ${fileCount} files working together to handle ${dataObject} operations.`}`;
-      } else if (mainVerb) {
-        // Pattern: verb only (e.g., "validator", "processor")
-        const action = getActionDescription(mainVerb);
-        const object = words.filter(w => w !== mainVerb).join(' ') || 'data';
-        
-        return `Handles ${object} ${mainVerb}ing operations. ${getVerbBasedExplanation(mainVerb, object, fileCount)}`;
-      } else if (purpose) {
-        // Pattern: purpose-based (e.g., "auth-service", "payment-gateway")
-        return getPurposeBasedDescription(purpose, words, fileCount);
-      } else if (dataSource) {
-        // Pattern: data source integration
-        return `Integration module for ${dataSource}. Contains ${fileCount} file${fileCount > 1 ? 's' : ''} handling connection, authentication, and data operations with ${dataSource}. ${hasSubdirs ? `Organized into ${subdirCount} specialized subdirectories for different aspects of the integration.` : 'Centralized module for all interactions.'}`;
-      }
+      // Build description from analysis
+      return buildIntelligentDescription(analysis, dirName, fileCount, subdirCount, hasSubdirs, hasFewFiles, hasMultipleFiles);
+    };
+    
+    const analyzeDirectoryIntent = (words: string[], fullName: string) => {
+      // Common verb patterns and their meanings
+      const verbPatterns = {
+        action: /^(fetch|get|retrieve|pull|download|grab|load|read)$/i,
+        create: /^(create|generate|build|make|construct|produce|compile|bundle)$/i,
+        modify: /^(update|edit|modify|change|transform|convert|process|handle|manage)$/i,
+        delete: /^(delete|remove|clear|clean|purge|drop)$/i,
+        send: /^(send|post|push|upload|publish|emit|broadcast|notify)$/i,
+        validate: /^(validate|verify|check|test|ensure|confirm)$/i,
+        render: /^(render|display|show|view|present|visualize)$/i,
+        parse: /^(parse|analyze|scan|inspect|examine|extract)$/i,
+        sync: /^(sync|synchronize|reconcile|merge|combine)$/i,
+        optimize: /^(optimize|improve|enhance|boost|speed|compress|minify)$/i,
+        calculate: /^(calculate|compute|count|sum|aggregate|measure)$/i,
+        format: /^(format|sanitize|normalize|standardize|prettify)$/i
+      };
       
-      // Smart fallback: analyze the directory name semantically
-      return getSemanticDescription(dirName, words, fileCount, subdirCount, hasSubdirs, hasFewFiles);
-    };
-    
-    const getActionDescription = (verb: string): string => {
-      const actionMap: Record<string, string> = {
-        'fetch': 'retrieves and downloads',
-        'get': 'fetches',
-        'retrieve': 'pulls',
-        'download': 'downloads',
-        'upload': 'uploads and stores',
-        'send': 'transmits',
-        'post': 'submits',
-        'create': 'generates',
-        'generate': 'creates',
-        'build': 'constructs',
-        'parse': 'analyzes and processes',
-        'analyze': 'examines',
-        'process': 'transforms',
-        'handle': 'manages',
-        'validate': 'verifies',
-        'update': 'modifies',
-        'delete': 'removes',
-        'sync': 'synchronizes',
-        'transform': 'converts',
-        'render': 'displays',
-        'calculate': 'computes'
-      };
-      return actionMap[verb] || verb + 's';
-    };
-    
-    const getSourceDescription = (source: string): string => {
-      const sourceMap: Record<string, string> = {
-        'github': 'GitHub repositories',
-        'gitlab': 'GitLab projects',
-        'bitbucket': 'Bitbucket repos',
-        'api': 'external APIs',
-        'database': 'the database',
-        'db': 'the database',
-        'storage': 'cloud storage',
-        'cache': 'the cache layer',
-        'file': 'file system',
-        'json': 'JSON data sources',
-        'csv': 'CSV files',
-        'excel': 'Excel spreadsheets'
-      };
-      return sourceMap[source] || source;
-    };
-    
-    const getObjectDescription = (dataObject: string): string => {
-      const objectDescriptions: Record<string, string> = {
-        'news': 'news articles and headlines',
-        'article': 'articles and blog posts',
-        'post': 'user posts and content',
-        'comment': 'user comments and discussions',
-        'message': 'messages and communications',
-        'notification': 'notifications and alerts',
-        'email': 'emails and correspondence',
-        'image': 'images and photos',
-        'video': 'videos and media files',
-        'document': 'documents and files',
-        'file': 'files and attachments',
-        'data': 'data and information',
-        'content': 'content and media',
-        'feed': 'feeds and streams',
-        'event': 'events and activities',
-        'log': 'logs and records',
-        'metric': 'metrics and measurements',
-        'report': 'reports and summaries',
-        'invoice': 'invoices and bills',
-        'receipt': 'receipts and transactions',
-        'transaction': 'transactions and payments',
-        'ticket': 'support tickets',
-        'issue': 'issues and bugs',
-        'task': 'tasks and assignments'
-      };
-      return objectDescriptions[dataObject] || dataObject;
-    };
-    
-    const getObjectContextExplanation = (verb: string, dataObject: string, fileCount: number): string => {
-      const contexts: Record<string, Record<string, string>> = {
-        'fetch': {
-          'news': 'Connects to news APIs or RSS feeds to download the latest headlines and article content. Used when users want to see current news or when the system needs to aggregate news from multiple sources.',
-          'article': 'Downloads article content from various sources. Handles API calls, content parsing, and data formatting.',
-          'image': 'Downloads images from URLs or cloud storage. Validates image formats and handles download errors.',
-          'data': 'Retrieves data from external APIs or databases. Acts as the data acquisition layer.',
-          'default': `Retrieves ${dataObject} from external sources and prepares it for use in the application.`
-        },
-        'process': {
-          'image': 'Transforms images through resizing, compression, format conversion, or applying filters. Optimizes images for web display.',
-          'data': 'Cleans, validates, and transforms raw data into a structured format the application can use.',
-          'news': 'Analyzes news content, extracts key information, categorizes articles, and prepares them for display.',
-          'default': `Transforms and validates ${dataObject} before storing or displaying it.`
-        },
-        'generate': {
-          'report': 'Creates formatted reports by aggregating data, applying calculations, and producing PDF/Excel outputs.',
-          'invoice': 'Generates invoices with line items, totals, taxes, and formatting for printing or email delivery.',
-          'notification': 'Creates notification messages based on events, formats them appropriately, and queues them for delivery.',
-          'default': `Creates ${dataObject} programmatically based on application data and business rules.`
-        },
-        'parse': {
-          'data': 'Reads and interprets data formats, converts them into structured objects the application can work with.',
-          'document': 'Extracts text and metadata from documents. Handles various file formats and encodings.',
-          'default': `Analyzes ${dataObject} structure and converts it into usable format.`
+      // Detect action type
+      let actionType = 'manage';
+      let actionWord = '';
+      for (const word of words) {
+        for (const [type, pattern] of Object.entries(verbPatterns)) {
+          if (pattern.test(word)) {
+            actionType = type;
+            actionWord = word;
+            break;
+          }
         }
+        if (actionWord) break;
+      }
+      
+      // Get the subject (what is being acted upon)
+      const subjects = words.filter(w => w !== actionWord && w.length > 2);
+      const subject = subjects.length > 0 ? subjects.join(' ') : fullName;
+      
+      // Detect if it's a service/module/function/integration
+      const moduleType = fullName.match(/(service|function|module|integration|client|server|api|gateway|handler|processor|controller|manager|provider|adapter|helper|util|middleware)$/i)?.[0] || 'module';
+      
+      return { actionType, actionWord, subject, subjects, moduleType };
+    };
+    
+    const buildIntelligentDescription = (analysis: any, dirName: string, fileCount: number, subdirCount: number, hasSubdirs: boolean, hasFewFiles: boolean, hasMultipleFiles: boolean): string => {
+      const { actionType, actionWord, subject, subjects, moduleType } = analysis;
+      
+      // Build the main action description
+      const actionDescriptions: Record<string, string> = {
+        action: `Retrieves ${subject} data from external sources`,
+        create: `Generates ${subject} programmatically`,
+        modify: `Processes and transforms ${subject}`,
+        delete: `Removes ${subject} from the system`,
+        send: `Transmits ${subject} to external destinations`,
+        validate: `Verifies ${subject} meets requirements`,
+        render: `Displays ${subject} to users`,
+        parse: `Analyzes and interprets ${subject}`,
+        sync: `Synchronizes ${subject} across systems`,
+        optimize: `Improves ${subject} performance`,
+        calculate: `Computes ${subject} values`,
+        format: `Standardizes ${subject} formatting`,
+        manage: `Manages ${subject} functionality`
       };
       
-      return contexts[verb]?.[dataObject] || contexts[verb]?.['default'] || `Manages ${dataObject} through ${verb} operations.`;
-    };
-    
-    const getContextualExplanation = (verb: string, source: string, words: string[], dataObject?: string): string => {
-      if (verb === 'fetch' && source === 'github') {
-        return 'When a user enters a GitHub URL, this function downloads the repository files, analyzes the structure, and prepares it for architecture parsing. Acts as the bridge between GitHub\'s API and your application.';
-      }
-      if (verb === 'generate' && words.includes('insight')) {
-        return 'Uses AI/LLM to analyze code patterns and generate intelligent recommendations. Takes raw architecture data and produces human-readable insights about code quality, design patterns, and potential improvements.';
-      }
-      if (verb === 'parse' && words.includes('architecture')) {
-        return 'Analyzes codebase structure and builds a visual graph of services, APIs, and dependencies. This is the core engine that understands how your code is organized.';
-      }
-      if (verb === 'upload') {
-        return 'Handles file uploads from users, validates the content, stores it securely, and triggers downstream processing. Entry point for local file analysis.';
-      }
-      return `Processes ${words.filter(w => w !== verb && w !== source).join(' ')} to enable core application functionality.`;
-    };
-    
-    const getVerbBasedExplanation = (verb: string, object: string, fileCount: number): string => {
-      const explanations: Record<string, string> = {
-        'generate': `Creates ${object} programmatically. Contains ${fileCount} file${fileCount > 1 ? 's' : ''} with generation logic, templates, and output formatting.`,
-        'parse': `Reads and interprets ${object}. Breaks down complex ${object} into structured data that other parts of the system can use.`,
-        'process': `Transforms ${object} from one form to another. Applies business logic, validation, and formatting rules.`,
-        'validate': `Ensures ${object} meets required criteria. Checks format, completeness, and correctness before allowing operations to proceed.`,
-        'render': `Displays ${object} to users. Takes data and converts it into visual components or formatted output.`,
-        'calculate': `Performs computations on ${object}. Contains mathematical operations, algorithms, and data processing logic.`
-      };
-      return explanations[verb] || `Manages ${object} operations with ${fileCount} specialized file${fileCount > 1 ? 's' : ''}.`;
-    };
-    
-    const getPurposeBasedDescription = (purpose: string, words: string[], fileCount: number): string => {
-      const descriptions: Record<string, string> = {
-        'auth': 'Authentication and authorization module. Handles user login, signup, session management, and access control. Verifies user identity and permissions before allowing access to protected resources.',
-        'user': 'User management system. Handles user profiles, preferences, account settings, and user-related data operations. Central hub for all user interactions.',
-        'admin': 'Administrative interface and tools. Provides elevated access for managing the system, viewing analytics, and performing administrative tasks.',
-        'dashboard': 'Dashboard interface displaying key metrics, charts, and system overview. Aggregates data from multiple sources into a unified view.',
-        'notification': 'Notification delivery system. Sends alerts to users via email, SMS, push notifications, or in-app messages. Handles notification preferences and delivery tracking.',
-        'payment': 'Payment processing integration. Handles transactions, payment method management, invoicing, and financial operations. Connects to payment gateways like Stripe or PayPal.',
-        'analytics': 'Data analytics and tracking module. Collects user behavior data, generates reports, and provides insights into system usage and performance.',
-        'search': 'Search functionality enabling users to find content quickly. Implements search algorithms, indexing, and result ranking.',
-        'export': 'Data export functionality allowing users to download information in various formats (PDF, CSV, Excel). Formats and packages data for external use.'
-      };
-      return descriptions[purpose] || `${purpose.charAt(0).toUpperCase() + purpose.slice(1)} module with ${fileCount} implementation file${fileCount > 1 ? 's' : ''}.`;
-    };
-    
-    const getSemanticDescription = (dirName: string, words: string[], fileCount: number, subdirCount: number, hasSubdirs: boolean, hasFewFiles: boolean): string => {
-      // Try to build a meaningful description from the words
-      const capitalizedName = dirName.split(/[-_\s]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const mainDescription = actionDescriptions[actionType] || `Handles ${subject} operations`;
       
-      if (hasFewFiles && !hasSubdirs) {
-        return `Focused ${capitalizedName} module containing ${fileCount} file${fileCount > 1 ? 's' : ''}. Small, self-contained functionality that handles ${words.join(' ')}-related operations. Good entry point for understanding ${dirName} behavior.`;
-      } else if (hasSubdirs) {
-        return `${capitalizedName} system with ${fileCount} files organized across ${subdirCount} subdirectories. Comprehensive module handling multiple aspects of ${words.join(' ')} functionality. Explore subdirectories to understand specific capabilities.`;
+      // Build context explanation based on what we can infer
+      let contextExplanation = '';
+      
+      if (actionType === 'action' && subjects.length > 1) {
+        // Fetching something specific
+        const target = subjects[subjects.length - 1];
+        const source = subjects.length > 1 ? subjects.slice(0, -1).join(' ') : 'external sources';
+        contextExplanation = `Connects to ${source} to download ${target}. Handles API calls, data parsing, error handling, and data formatting. `;
+      } else if (actionType === 'create') {
+        contextExplanation = `Creates ${subject} based on application data and business logic. Formats output and handles template rendering. `;
+      } else if (actionType === 'modify' || actionType === 'parse') {
+        contextExplanation = `Takes raw ${subject} and transforms it into structured, validated data the application can use. Applies business rules and formatting. `;
+      } else if (actionType === 'validate') {
+        contextExplanation = `Ensures ${subject} is correctly formatted, complete, and meets all requirements before processing. Prevents invalid data from entering the system. `;
+      } else if (actionType === 'send') {
+        contextExplanation = `Packages ${subject} and delivers it to external systems or users. Handles retry logic, formatting, and delivery confirmation. `;
+      } else if (moduleType.match(/integration|client|adapter/i)) {
+        contextExplanation = `Integration layer that handles all communication with ${subject}. Manages authentication, request formatting, response parsing, and error handling. `;
+      } else if (moduleType.match(/service/i)) {
+        contextExplanation = `Service layer containing business logic for ${subject}. Coordinates between different parts of the application. `;
       } else {
-        return `${capitalizedName} implementation with ${fileCount} files working together. Provides ${words.join(' ')}-related functionality for the application. Review files to understand the complete ${dirName} workflow.`;
+        // Generic but still informative
+        const capabilities = [];
+        if (subjects.some(s => s.match(/api|http|rest|graphql/i))) capabilities.push('API integration');
+        if (subjects.some(s => s.match(/db|database|sql|mongo|redis/i))) capabilities.push('database operations');
+        if (subjects.some(s => s.match(/auth|login|token/i))) capabilities.push('authentication');
+        if (subjects.some(s => s.match(/file|upload|download|storage/i))) capabilities.push('file handling');
+        
+        if (capabilities.length > 0) {
+          contextExplanation = `Handles ${capabilities.join(', ')} for ${subject}. `;
+        } else {
+          contextExplanation = `Core ${moduleType} for ${subject} functionality. `;
+        }
       }
+      
+      // Add file organization context
+      let fileContext = '';
+      if (fileCount === 1 && !hasSubdirs) {
+        fileContext = 'Single file implementation - good starting point for understanding this functionality.';
+      } else if (hasFewFiles && !hasSubdirs) {
+        fileContext = `Compact ${moduleType} with ${fileCount} focused files working together.`;
+      } else if (hasSubdirs) {
+        fileContext = `Comprehensive ${moduleType} with ${fileCount} files across ${subdirCount} subdirectories - explore subdirectories for specific capabilities.`;
+      } else {
+        fileContext = `Contains ${fileCount} files implementing the complete ${subject} workflow.`;
+      }
+      
+      return `${mainDescription}. ${contextExplanation}${fileContext}`;
     };
-
+    
     // Helper to get directory description
     const getDirDescription = (dirName: string, fileCount: number, fileTypes: string[], subdirCount: number) => {
       const hasMultipleFiles = fileCount > 3;
