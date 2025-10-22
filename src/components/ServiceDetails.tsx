@@ -76,12 +76,19 @@ export const ServiceDetails = ({ node }: ServiceDetailsProps) => {
         </div>
       </div>
 
-      <div className="flex justify-end mt-4">
-        <Button variant="outline" size="sm" className="gap-2">
-          View Source Code
-          <ArrowRight className="w-4 h-4" />
-        </Button>
-      </div>
+      {node.data.codePath && (
+        <div className="flex justify-end mt-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => window.open(node.data.codePath, '_blank')}
+          >
+            View Source Code
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };
